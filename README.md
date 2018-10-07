@@ -28,6 +28,7 @@ make -C /usr/src/linux-headers-$(uname -r)/ M=$(pwd) modules_install
 modprobe ds2482
 echo ds2482 0x18 > /sys/bus/i2c/devices/i2c-1/new_device
 modprobe w1_ds2438
+chmod a+rw /sys/bus/w1/devices/[CHIP_ID]/iad
 ```
 
 ## Installation

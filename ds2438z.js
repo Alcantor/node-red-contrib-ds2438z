@@ -21,9 +21,6 @@ module.exports = function(RED) {
 			rhum: 0
 		}
 
-		/* Enable or disable the current measure */
-		fs.writeFile(W1_DEVICES + node.chipId + '/iad', node.chipIad, W1_CHARSET, function (err) {} );
-
 		/* Read page0 at each interval second */
 		setInterval(function() {
 			data = fs.readFileSync(W1_DEVICES + node.chipId + '/temperature', W1_CHARSET);
@@ -52,13 +49,19 @@ module.exports = function(RED) {
 			
 		}, node.interval);
 
+		/* Close the timer on exit */
 		this.on("close", function() {
 			clearInterval(node.update_timer);
 		});
+
+		/* Enable or disable the current measure */
+		/* Could cause an exception if write permission is denied */
+		fs.writeFileSync(W1_DEVICES + node.chipId + '/iad', node.chipIad, W1_CHARSET);
 	}
 
 	RED.nodes.registerType("ds2438z", DS2438ZNode);
 
+	/* Create a list with the one-wire slaves */
 	RED.httpAdmin.get('/sensors/w1-slaves/', function(req, res) {
 		fs.readFile(W1_DEVICES+W1_DEVICES_LIST, W1_CHARSET, function (err, data) {
 			if (! err) {
