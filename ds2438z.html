@@ -1,0 +1,67 @@
+<script type="text/javascript">
+	RED.nodes.registerType('ds2438z',{
+		category: 'Raspberry Pi',
+		color: "#C7E9C0",
+		defaults: {
+			name:     {value:""},
+			chipId:   {value:"" , required:true},
+			chipIad:  {value:"0", required:true},
+			interval: {value:"1", required:true, validate:RED.validators.number()}
+		},
+		inputs: 0,
+		outputs: 1,
+		icon: "thermometer.png",
+		label: function() {
+			return this.name || this.chipId || "ds2438z";
+		},
+		labelStyle: function() {
+			return this.name ? "node_label_italic" : "";
+		},
+		oneditprepare: function() {
+			var node = this;
+			var isSelected;
+			$.getJSON('/sensors/w1-slaves/', function(data) {
+				$.each(data, function( index, value ) {
+					is_selected = node.chipId === value;
+					$("#node-input-chipId").append(new Option(value, value, isSelected, isSelected));
+				});
+			});
+			is_selected = node.chip_iad === "0";
+			$("#node-input-chipIad").append(new Option("Disable", "0", isSelected, isSelected));
+			is_selected = node.chip_iad === "1";
+			$("#node-input-chipIad").append(new Option("Enable",  "1", isSelected, isSelected));
+		}
+	});
+</script>
+
+<script type="text/x-red" data-template-name="ds2438z">
+	<div class="form-row">
+		<label for="node-input-name"><i class="icon-tag"></i> Name/topic</label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+	<div class="form-row">
+		<label for="node-input-chipId">
+			<i class="fa fa-ellipsis-v"></i>
+			<span> Sensor ID</span>
+		</label>
+		<select type="text" id="node-input-chipId"></select>
+	</div>
+	<div class="form-row">
+		<label for="node-input-chipIad">
+			<i class="fa fa-ellipsis-v"></i>
+			<span> IAD</span>
+		</label>
+		<select type="text" id="node-input-chipIad"></select>
+	</div>
+	<div class="form-row">
+		<label for="node-input-interval">
+			<i class="fa fa-repeat"></i>
+			<span> Interval (sec)</span>
+		</label>
+		<input type="text" id="node-input-interval" placeholder="1">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="ds2438z">
+	<p>Read a temperature, humitidy and light value from a DS2438Z sensor</p>
+</script>
