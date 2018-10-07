@@ -6,9 +6,9 @@ I've use it with a Raspberry Pi 3 with a "1 Wire Pi Plus" Board.
 A DS2482S makes a bridge between the i2c and the one-wire bus.
 Then the DS2438Z measures the temperature, humidity and light of my rooms.
 
-Raspberry Pi 3: https://www.raspberrypi.org/
-1 Wire Pi Plus: https://www.abelectronics.co.uk/p/60/1-wire-pi-plus
-Room-Sensor: https://taaralabs.eu/1-wire-temperature-humidity-light-sensor/
+* Raspberry Pi 3: https://www.raspberrypi.org/
+* 1 Wire Pi Plus: https://www.abelectronics.co.uk/p/60/1-wire-pi-plus
+* Room-Sensor: https://taaralabs.eu/1-wire-temperature-humidity-light-sensor/
 
 ## Requirements
 
