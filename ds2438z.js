@@ -10,42 +10,73 @@ module.exports = function(RED) {
 		var node = this;
 		node.chipId   = config.chipId;
 		node.chipIad  = config.chipIad;
+		node.rsens    = config.rsens;
 		node.interval = config.interval * 1000;
 		node.msg = {
 			payload : "No values",
-			temp: 0,
-			vdd : 0,
-			vad : 0,
-			iad : 0,
-			shum: 0,
-			rhum: 0
+			temp: 0, /* in °C */
+			vdd : 0, /* in V */
+			vad : 0, /* in V */
+			iad : 0, /* in mA */
+			shum: 0, /* in % (Standard humidity at 25°C) */
+			rhum: 0, /* in % (Relative humidity) */
+			lux : 0  /* in lx */
 		}
 
+		/* Enable or disable the current measurement */
+		try {
+			fs.writeFileSync(W1_DEVICES + node.chipId + '/iad', node.chipIad, W1_CHARSET);
+		}catch(err){}
+
 		/* Read page0 at each interval second */
-		setInterval(function() {
-			data = fs.readFileSync(W1_DEVICES + node.chipId + '/temperature', W1_CHARSET);
-			if(data) node.msg.temp = parseInt(data) / 256.0;
+		node.update_timer = setInterval(function() {
+			node.msg.payload = "Temp.: ";
+			try{
+				data = fs.readFileSync(W1_DEVICES + node.chipId + '/temperature', W1_CHARSET);
+				node.msg.temp = parseInt(data) / 256.0;
+				node.msg.payload += node.msg.temp.toFixed(2)+"°C ";
+			}catch(err){
+				node.msg.payload += "ERROR ";
+			}
 
-			data = fs.readFileSync(W1_DEVICES + node.chipId + '/vdd', W1_CHARSET);
-			if(data) node.msg.vdd  = parseInt(data) * 0.01;
+			node.msg.payload += "VDD: ";
+			try{
+				data = fs.readFileSync(W1_DEVICES + node.chipId + '/vdd', W1_CHARSET);
+				node.msg.vdd  = parseInt(data) / 100.0;
+				node.msg.payload += node.msg.vdd.toFixed(2)+"V ";
+			}catch (err){
+				node.msg.payload += "ERROR ";
+			}
 
-			data = fs.readFileSync(W1_DEVICES + node.chipId + '/vad', W1_CHARSET);
-			if(data) node.msg.vad  = parseInt(data) * 0.01;
+			node.msg.payload += "VAD: ";
+			try{
+				data = fs.readFileSync(W1_DEVICES + node.chipId + '/vad', W1_CHARSET);
+				node.msg.vad  = parseInt(data) / 100.0;
+				node.msg.payload += node.msg.vad.toFixed(2)+"V ";
+			}catch (err){
+				node.msg.payload += "ERROR ";
+			}
 
 			/* Don't work with old w1_ds2438 driver (iad write only) */
-			data = fs.readFileSync(W1_DEVICES + node.chipId + '/iad', W1_CHARSET);
-			if(data) node.msg.iad  = parseInt(data) * 0.0002441;
+			node.msg.payload += "IAD: ";
+			try{
+				data = fs.readFileSync(W1_DEVICES + node.chipId + '/iad', W1_CHARSET);
+				node.msg.iad  = parseInt(data) / (4.096 * node.rsens);
+				node.msg.payload += node.msg.iad.toFixed(6)+"mA ";
+			}catch (err){
+				node.msg.payload += "ERROR ";
+			}
 
-			/* Compute humidity (Humidity sonsor HIH-5030 on VAD Input of the DS2438Z) */
-			node.msg.shum = ((node.msg.vad / node.msg.vdd) - 0.16) / 0.0062;
+			/* Compute humidity (Humidity sensor HIH-5030 on VAD Input of the DS2438Z) */
+			node.msg.shum = ((node.msg.vad / node.msg.vdd) - 0.1515) / 0.00636;
 			node.msg.rhum = node.msg.shum / (1.0546 - ( 0.00216 * node.msg.temp))
+			node.msg.payload += "Rel. Humidity: "+node.msg.rhum.toFixed(2)+"% ";
 
-			node.msg.payload =
-				"Temp.: " + node.msg.temp.toFixed(2)+"°C "+
-				"Rel. Humidity: "+node.msg.rhum.toFixed(2)+"% "+
-				"Light: "+node.msg.iad.toFixed(2)+"?"
-			
-                	node.send(node.msg);
+			/* Compute light (Light sensor BPW 34 S on IAD Input of the DS2438Z) */
+			node.msg.lux = node.msg.iad * 12000.0;
+			node.msg.payload += "Light: "+node.msg.lux.toFixed(2)+"lx";
+
+			node.send(node.msg);
 			
 		}, node.interval);
 
@@ -53,10 +84,6 @@ module.exports = function(RED) {
 		this.on("close", function() {
 			clearInterval(node.update_timer);
 		});
-
-		/* Enable or disable the current measure */
-		/* Could cause an exception if write permission is denied */
-		fs.writeFileSync(W1_DEVICES + node.chipId + '/iad', node.chipIad, W1_CHARSET);
 	}
 
 	RED.nodes.registerType("ds2438z", DS2438ZNode);
