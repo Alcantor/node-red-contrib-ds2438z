@@ -23,7 +23,7 @@ not readable. See driver folder in the repository.
 ```
 cd driver
 make -C /usr/src/linux-headers-$(uname -r)/ M=$(pwd) modules
-make -C /usr/src/linux-headers-$(uname -r)/ M=$(pwd) modules_install
+make -C /usr/src/linux-headers-$(uname -r)/ M=$(pwd) INSTALL_MOD_DIR=kernel/drivers/w1/slaves/ modules_install
 
 modprobe ds2482
 echo ds2482 0x18 > /sys/bus/i2c/devices/i2c-1/new_device
