@@ -21,7 +21,7 @@
 		oneditprepare: function() {
 			var node = this;
 			var isSelected;
-			$.getJSON('/sensors/w1-slaves/', function(data) {
+			$.getJSON('sensors/w1-slaves/', function(data) {
 				$.each(data, function( index, value ) {
 					isSelected = node.chipId === value;
 					$("#node-input-chipId").append(new Option(value, value, isSelected, isSelected));
