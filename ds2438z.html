@@ -10,7 +10,7 @@
 			interval: {value:"5", required:true, validate:RED.validators.number()}
 		},
 		inputs: 0,
-		outputs: 1,
+		outputs: 7,
 		icon: "thermometer.png",
 		label: function() {
 			return this.name || this.chipId || "ds2438z";
@@ -72,4 +72,16 @@
 
 <script type="text/x-red" data-help-name="ds2438z">
 	<p>Read a temperature, humitidy and light value from a DS2438Z sensor</p>
+	<p><table>
+		<tr><th>Outputs</th><th>Descriptions</th></tr>
+		<tr><td>1</td><td>Temperature (°C)</td></tr>
+		<tr><td>2</td><td>VDD (V)</td></tr>
+		<tr><td>3</td><td>VAD (V)</td></tr>
+		<tr><td>4</td><td>IAD (mA)</td></tr>
+		<tr><td>5</td><td>*Standard humidity at 25°C (%)</td></tr>
+		<tr><td>6</td><td>*Relative humidity (%)</td></tr>
+		<tr><td>7</td><td>**Luminosity (lx)</td></tr>
+	</table></p>
+	<p>*Humidity sensor HIH-5030 on VAD Input of the DS2438Z</p>
+	<p>**Light sensor BPW 34 S on IAD Input of the DS2438Z</p>
 </script>
