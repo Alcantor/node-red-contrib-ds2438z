@@ -10,8 +10,9 @@ module.exports = function(RED) {
 		var node = this;
 		node.chipId   = config.chipId;
 		node.chipIad  = config.chipIad;
-		node.rsens    = config.rsens;
-		node.interval = config.interval * 1000;
+		node.rsens    = parseInt(config.rsens);
+		node.interval = parseInt(config.interval) * 1000;
+		node.tempAdj  = parseInt(config.tempAdj);
 
 		/* Enable or disable the current measurement */
 		fs.writeFileSync(W1_DEVICES + node.chipId + '/iad', node.chipIad, function(err){
@@ -25,7 +26,7 @@ module.exports = function(RED) {
 					node.status({fill:"red",shape:"ring",text:"Read Temperature Error"});
 					return;
 				}
-				var temp = parseInt(data) / 256.0;
+				var temp = parseInt(data) / 256.0 + node.tempAdj;
 				fs.readFile(W1_DEVICES + node.chipId + '/vdd', W1_CHARSET, function(err,data){
 					if(err){
 						node.status({fill:"red",shape:"ring",text:"Read VDD Error"});

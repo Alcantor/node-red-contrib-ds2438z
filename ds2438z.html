@@ -7,7 +7,8 @@
 			chipId:   {value:"" , required:true},
 			chipIad:  {value:"1", required:true},
 			rsens:    {value:"4700", required:true, validate:RED.validators.number()},
-			interval: {value:"5", required:true, validate:RED.validators.number()}
+			interval: {value:"5", required:true, validate:RED.validators.number()},
+			tempAdj:  {value:"0", required:true, validate:RED.validators.number()}
 		},
 		inputs: 0,
 		outputs: 7,
@@ -67,6 +68,13 @@
 			<span> Interval (sec)</span>
 		</label>
 		<input type="text" id="node-input-interval">
+	</div>
+	<div class="form-row">
+		<label for="node-input-tempAdj">
+			<i class="fa fa-ellipsis-v"></i>
+			<span> Temp. Adj. (°C)</span>
+		</label>
+		<input type="text" id="node-input-tempAdj">
 	</div>
 </script>
 
