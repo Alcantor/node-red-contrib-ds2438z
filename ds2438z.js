@@ -57,7 +57,7 @@ module.exports = function(RED) {
 								{'topic': "iad", 'payload': iad}, /* in mA */
 								{'topic': "stdHumidity", 'payload': shum}, /* in % (Standard humidity at 25°C) */
 								{'topic': "relHumidity", 'payload': rhum}, /* in % (Relative humidity) */
-								{'topic': "luminosity", 'payload': vad}, /* in lx */
+								{'topic': "luminosity", 'payload': lux}, /* in lx */
 							]);
 							node.status({fill:"green",shape:"ring",text:"OK"});
 						});
